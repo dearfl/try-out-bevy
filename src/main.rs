@@ -6,6 +6,9 @@ struct Person;
 #[derive(Component)]
 struct Name(String);
 
+#[derive(Resource)]
+struct GreetTimer(Timer);
+
 pub struct GreetPlugin;
 
 impl GreetPlugin {
@@ -15,9 +18,15 @@ impl GreetPlugin {
         commands.spawn((Person, Name("Charles".to_string())));
     }
 
-    fn greet_people(people: Query<&Name, With<Person>>) {
-        for name in people.iter() {
-            println!("Hello {}!", name.0);
+    fn greet_people(
+        time: Res<Time>,
+        mut timer: ResMut<GreetTimer>,
+        people: Query<&Name, With<Person>>,
+    ) {
+        if timer.0.tick(time.delta()).just_finished() {
+            for name in people.iter() {
+                println!("Hello {}!", name.0);
+            }
         }
     }
 
@@ -30,7 +39,8 @@ impl GreetPlugin {
 
 impl Plugin for GreetPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, Self::add_people)
+        app.insert_resource(GreetTimer(Timer::from_seconds(2.0, TimerMode::Repeating)))
+            .add_systems(Startup, Self::add_people)
             .add_systems(Update, (Self::update_people, Self::greet_people).chain());
     }
 }
