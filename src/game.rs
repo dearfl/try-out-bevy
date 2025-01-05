@@ -169,13 +169,14 @@ fn setup(
     let bird_layout = texture_atlas_layouts.add(bird_layout);
     let animation_index = AnimationIndex::new(0, 3);
     commands.spawn((
-        Sprite::from_atlas_image(
-            bird,
-            TextureAtlas {
+        Sprite {
+            image: bird,
+            texture_atlas: Some(TextureAtlas {
                 layout: bird_layout,
                 index: animation_index.first,
-            },
-        ),
+            }),
+            ..Default::default()
+        },
         Transform::from_translation(Vec3::new(0.0, H_BASE / 2.0, 1.0)),
         animation_index,
         AnimationTimer::from_seconds(0.2),
