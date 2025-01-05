@@ -1,8 +1,12 @@
 mod game;
 
-use bevy::prelude::*;
+use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use game::FlappyBirdPlugin;
+
+fn exit(mut exit: EventWriter<AppExit>) {
+    exit.send(AppExit::Success);
+}
 
 fn main() {
     App::new()
@@ -19,5 +23,6 @@ fn main() {
                 .set(ImagePlugin::default_nearest()),
         )
         .add_plugins(FlappyBirdPlugin)
+        .add_systems(Update, exit.run_if(input_just_pressed(KeyCode::Escape)))
         .run();
 }
